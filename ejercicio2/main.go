@@ -8,6 +8,7 @@ import (
 
 func main() {
 
+	// prueba de commit con hooks
 	http.HandleFunc("/greetings", func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != http.MethodPost {
 			http.Error(w, "Invalid request method", http.StatusMethodNotAllowed)
