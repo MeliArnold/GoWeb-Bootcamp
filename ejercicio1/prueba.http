@@ -1,0 +1,15 @@
+// prueba-chi perteneciente al ejercicio1
+
+GET localhost:8080/ping
+
+
+
+// prueba-chi perteneciente al ejercicio2
+###
+POST localhost:8080/greetings
+Content-Type: application/json
+
+{
+  "FirstName": "Andres 12",
+  "LastName": "Rivas"
+}

@@ -1,0 +1,13 @@
+
+
+
+
+// prueba-chi perteneciente al ejercicio2
+###
+POST localhost:8080/greetings
+Content-Type: application/json
+
+{
+  "FirstName": "Andrea",
+  "LastName": "Rivas"
+}

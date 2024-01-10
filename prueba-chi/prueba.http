@@ -1,0 +1,14 @@
+GET localhost:8080/users/posts
+
+
+###
+GET localhost:8080/users/nosotros
+
+###
+GET localhost:8080/productos/items
+
+###
+GET localhost:8080/productos/precios
+
+###
+GET localhost:8080/users/parametros/1
