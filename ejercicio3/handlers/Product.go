@@ -131,3 +131,91 @@ func ListByPrice(response http.ResponseWriter, request *http.Request) {
 		json.NewEncoder(response).Encode(resp)
 	}
 }
+
+func validateProduct(product modelos.Product) error {
+	if len(product.Name) == 0 || len(product.Expiration) == 0 || product.Price <= 0 || len(product.CodeValue) == 0 || product.Quantity <= 0 {
+		return fmt.Errorf("invalid product data")
+	}
+
+	var products []modelos.Product
+	// Check for unique code_value
+	for _, existingProduct := range products {
+		if existingProduct.CodeValue == product.CodeValue {
+			return fmt.Errorf("code_value %s already used", product.CodeValue)
+		}
+	}
+
+	return nil
+}
+
+// modified addProduct function to use validateProduct with products array
+func addProduct(newproduct modelos.Product) error {
+	products := ChargeProducts()
+
+	// Loop through all products and check if code_value already exists
+	for _, product := range products {
+		if product.CodeValue == newproduct.CodeValue {
+			return fmt.Errorf("code value %s already exists", newproduct.CodeValue)
+		}
+	}
+
+	// Assign new id
+	if len(products) > 0 {
+		newproduct.Id = products[len(products)-1].Id + 1
+	}
+
+	// Validation moved here
+	err := validateProduct(newproduct)
+	if err != nil {
+		return err
+	}
+
+	products = append(products, newproduct)
+	jsonFile, err := os.OpenFile("./productos.json", os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		log.Fatalf("unable to open file: %v", err)
+	}
+	defer jsonFile.Close()
+
+	byteValue, err := json.Marshal(products)
+	if err != nil {
+		log.Fatalf("unable to marshal products: %v", err)
+	}
+	_, err = jsonFile.Write(byteValue)
+	if err != nil {
+		log.Fatalf("unable to write to file: %v", err)
+	}
+	return nil
+}
+
+func AddProductHandler(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Content-Type", "application/properties")
+	if request.Method != http.MethodPost {
+		response.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	decoder := json.NewDecoder(request.Body)
+	var newproduct modelos.Product
+	err := decoder.Decode(&newproduct)
+	if err != nil {
+		response.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = validateProduct(newproduct)
+	if err != nil {
+		response.Header().Set("Content-Type", "application/json")
+		//response.WriteHeader(http.StatusBadRequest)
+		respuesta := map[string]string{
+			"mensaje": "error de validacion",
+		}
+		json.NewEncoder(response).Encode(respuesta)
+
+	}
+	err = addProduct(newproduct)
+	if err != nil {
+		response.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	response.WriteHeader(http.StatusCreated)
+	json.NewEncoder(response).Encode(newproduct)
+}

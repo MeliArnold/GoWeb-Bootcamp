@@ -1,5 +1,5 @@
 // buscar producto por id
-GET localhost:8080/parametros/1
+GET localhost:8080/parametros/509
 
 
 ###
@@ -8,3 +8,15 @@ GET localhost:8080/precio/700
 
 
 
+###
+POST localhost:8080/addProduct
+Content-Type: application/json
+
+{
+  "name": "yyy",
+  "quantity": 439,
+  "code_value": "S82254D5",
+  "is_published": true,
+  "expiration": "15/12/2021",
+  "price": 71.42
+}
