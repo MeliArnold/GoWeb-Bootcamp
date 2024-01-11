@@ -16,6 +16,7 @@ func main() {
 	r.Post("/addProduct", handlers.AddProductHandler)
 	r.Put("/updateProduct", handlers.EditarProducto)
 	r.Patch("/patchPrice", handlers.PatchPrice)
+	r.Delete("/deleteProduct/{id}", handlers.DeleteProductHandler)
 
 	http.ListenAndServe(":8080", r)
 }

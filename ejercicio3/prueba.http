@@ -44,3 +44,7 @@ Content-Type: application/json
   "id": 2,
   "price": "banana"
 }
+
+
+###
+DELETE localhost:8080/deleteProduct/509

@@ -345,3 +345,50 @@ func PatchPrice(response http.ResponseWriter, request *http.Request) {
 	response.WriteHeader(http.StatusNotFound)
 
 }
+
+func DeleteProduct(ID int) error {
+	products := ChargeProducts()
+	for index, product := range products {
+		if product.Id == ID {
+			products = append(products[:index], products[index+1:]...)
+			err := SaveProducts(products)
+
+			if err != nil {
+				return err
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("Product with Id %d not found", ID)
+}
+
+func DeleteProductHandler(response http.ResponseWriter, r *http.Request) {
+	response.Header().Set("Content-Type", "application/json")
+	if r.Method != http.MethodDelete {
+		response.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	param := chi.URLParam(r, "id")
+	if param == "" {
+		fmt.Println("id NOT PROVIDED")
+		return
+	}
+
+	id, err := strconv.Atoi(param)
+	if err != nil {
+		fmt.Printf("Error parsing ID: %v\n", err)
+		return
+	}
+
+	err = DeleteProduct(id)
+	if err != nil {
+		response.WriteHeader(http.StatusNotFound)
+		return
+	}
+
+	response.WriteHeader(http.StatusOK)
+	json.NewEncoder(response).Encode(map[string]string{
+		"message": fmt.Sprintf("Product with ID %d is successfully deleted", id),
+	})
+}
