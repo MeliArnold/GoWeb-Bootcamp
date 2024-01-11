@@ -14,6 +14,7 @@ func main() {
 	r.Get("/parametros/{id}", handlers.ListByID)
 	r.Get("/precio/{price}", handlers.ListByPrice)
 	r.Post("/addProduct", handlers.AddProductHandler)
+	r.Put("/updateProduct", handlers.EditarProducto)
 
 	http.ListenAndServe(":8080", r)
 }

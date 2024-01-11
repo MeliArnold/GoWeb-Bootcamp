@@ -219,3 +219,58 @@ func AddProductHandler(response http.ResponseWriter, request *http.Request) {
 	response.WriteHeader(http.StatusCreated)
 	json.NewEncoder(response).Encode(newproduct)
 }
+
+// Editar un producto en el slice
+
+func EditarProducto(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Content-Type", "application/properties")
+	if request.Method != http.MethodPut {
+		response.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+	decoder := json.NewDecoder(request.Body)
+	var updatedProduct modelos.Product
+	err := decoder.Decode(&updatedProduct)
+	if err != nil {
+		response.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	err = validateProduct(updatedProduct)
+	if err != nil {
+		response.Header().Set("Content-Type", "application/json")
+		respuesta := map[string]string{
+			"mensaje": "error de validacion",
+		}
+		json.NewEncoder(response).Encode(respuesta)
+		return
+	}
+	UpdateProduct(updatedProduct)
+	response.WriteHeader(http.StatusOK)
+	json.NewEncoder(response).Encode(updatedProduct)
+}
+
+func UpdateProduct(newProduct modelos.Product) error {
+	var productList []modelos.Product = ChargeProducts()
+	for index, product := range productList {
+		if product.Id == newProduct.Id {
+			productList[index] = newProduct
+			// Guarda productList en el almacén de datos
+			return SaveProducts(productList)
+		}
+	}
+	return fmt.Errorf("Producto no encontrado")
+}
+
+func SaveProducts(products []modelos.Product) error {
+	jsonData, err := json.Marshal(products)
+	if err != nil {
+		return err
+	}
+	err = ioutil.WriteFile("./productos.json", jsonData, 0644)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+// fin editar producto en el slice

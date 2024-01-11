@@ -1,5 +1,5 @@
 // buscar producto por id
-GET localhost:8080/parametros/509
+GET localhost:8080/parametros/1
 
 
 ###
@@ -15,7 +15,22 @@ Content-Type: application/json
 {
   "name": "yyy",
   "quantity": 439,
-  "code_value": "S82254D5",
+  "code_value": "S82254D57854",
+  "is_published": true,
+  "expiration": "15/12/2021",
+  "price": 71.42
+}
+
+
+###
+PUT localhost:8080/updateProduct
+Content-Type: application/json
+
+{
+  "id": 1,
+  "name": "Oil - Margarine1.1",
+  "quantity": 439,
+  "code_value": "S82254D",
   "is_published": true,
   "expiration": "15/12/2021",
   "price": 71.42

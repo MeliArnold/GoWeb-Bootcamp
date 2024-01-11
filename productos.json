@@ -1,7 +1,7 @@
 [
   {
     "id": 1,
-    "name": "Oil - Margarine",
+    "name": "Oil - Margarine1.1",
     "quantity": 439,
     "code_value": "S82254D",
     "is_published": true,
@@ -4576,6 +4576,15 @@
     "name": "yyy",
     "quantity": 439,
     "code_value": "S82254D5",
+    "is_published": true,
+    "expiration": "15/12/2021",
+    "price": 71.42
+  },
+  {
+    "id": 510,
+    "name": "yyy",
+    "quantity": 439,
+    "code_value": "S82254D57854",
     "is_published": true,
     "expiration": "15/12/2021",
     "price": 71.42
