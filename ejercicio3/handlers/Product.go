@@ -362,6 +362,18 @@ func DeleteProduct(ID int) error {
 	return fmt.Errorf("Product with Id %d not found", ID)
 }
 
+// DeleteProductHandler es un controlador HTTP que maneja las solicitudes de eliminación de productos.
+// Establece el encabezado Content-Type de la respuesta en "application/json".
+// Si la solicitud no es de tipo DELETE, devuelve un código de estado 405 (Method Not Allowed) y finaliza el controlador.
+// Obtiene el parámetro "id" de la ruta utilizando chi.
+// Si el parámetro "id" no está presente, imprime "id NOT PROVIDED" y finaliza el controlador.
+// Convierte el parámetro "id" a un valor entero utilizando strconv.Atoi.
+// Si ocurre un error al parsear el "id", imprime "Error parsing ID: {error}" y finaliza el controlador.
+// Llama a la función DeleteProduct pasando el "id" como argumento.
+// Si ocurre un error al eliminar el producto, establece el código de estado de la respuesta en 404 (Not Found) y finaliza el controlador.
+// Establece el código de estado de la respuesta en 200 (OK).
+// Codifica un mapa de tipo map[string]string en JSON y lo escribe como respuesta en la respuesta HTTP.
+// El mapa contiene un mensaje indicando que el producto con el "id" especificado ha sido eliminado correctamente.
 func DeleteProductHandler(response http.ResponseWriter, r *http.Request) {
 	response.Header().Set("Content-Type", "application/json")
 	if r.Method != http.MethodDelete {
