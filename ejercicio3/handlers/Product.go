@@ -222,6 +222,18 @@ func AddProductHandler(response http.ResponseWriter, request *http.Request) {
 
 // Editar un producto en el slice
 
+// EditarProducto es una función que se utiliza para editar un producto existente en la base de datos.
+// Recibe una respuesta http.ResponseWriter y una solicitud http.Request como parámetros.
+// Establece el encabezado de la respuesta a "application/properties".
+// Si el método de solicitud no es PUT, establece el estado de la respuesta a Method Not Allowed (405) y retorna.
+// Decodifica el cuerpo de la solicitud JSON utilizando json.NewDecoder y lo asigna a la variable updatedProduct de tipo modelos.Product.
+// Si hay un error durante la decodificación, establece el estado de la respuesta a Bad Request (400) y retorna.
+// Llama a la función validateProduct con updatedProduct para validar los datos del producto.
+// Si hay un error de validación, establece el encabezado de la respuesta a "application/json".
+// Crea una respuesta en formato JSON con un mensaje de error y lo envía en la respuesta.
+// Llama a la función UpdateProduct pasando updatedProduct para actualizar el producto en la base de datos.
+// Establece el estado de la respuesta a OK (200).
+// Codifica updatedProduct en formato JSON y lo envía en la respuesta.
 func EditarProducto(response http.ResponseWriter, request *http.Request) {
 	response.Header().Set("Content-Type", "application/properties")
 	if request.Method != http.MethodPut {
@@ -249,18 +261,26 @@ func EditarProducto(response http.ResponseWriter, request *http.Request) {
 	json.NewEncoder(response).Encode(updatedProduct)
 }
 
+// UpdateProduct actualiza un producto existente en la lista de productos.
+// Recibe un nuevo producto (newProduct) y busca un producto en la lista de productos cargada con la función ChargeProducts
+// que tenga el mismo id que el nuevo producto.
+// Si encuentra un producto con el mismo id, lo actualiza con el nuevo producto y guarda la lista actualizada utilizando la función SaveProducts.
+// Si no encuentra un producto con el mismo id, devuelve un error indicando que el producto no fue encontrado.
 func UpdateProduct(newProduct modelos.Product) error {
 	var productList []modelos.Product = ChargeProducts()
 	for index, product := range productList {
 		if product.Id == newProduct.Id {
 			productList[index] = newProduct
-			// Guarda productList en el almacén de datos
+
 			return SaveProducts(productList)
 		}
 	}
 	return fmt.Errorf("Producto no encontrado")
 }
 
+// SaveProducts toma un slice de modelos.Product y lo guarda en un archivo JSON llamado "productos.json".
+// Convierte los datos en formato JSON utilizando la función json.Marshal y luego los guarda en el archivo utilizando ioutil.WriteFile.
+// Devuelve un error si hubo algún problema al convertir o guardar los datos en el archivo.
 func SaveProducts(products []modelos.Product) error {
 	jsonData, err := json.Marshal(products)
 	if err != nil {
@@ -274,3 +294,54 @@ func SaveProducts(products []modelos.Product) error {
 }
 
 // fin editar producto en el slice
+
+// PatchPrice actualiza el precio de un producto existente en función de los datos proporcionados en la solicitud HTTP PATCH.
+//
+// Establece el encabezado "Content-Type" de la respuesta a "application/json".
+// Si el método de la solicitud no es PATCH, establece el código de estado HTTP en 405 (Method Not Allowed) y finaliza la ejecución.
+//
+// Decodifica los parámetros de la solicitud HTTP PATCH utilizando json.Decoder.
+// Deserializa los datos decodificados en una variable "updatedProduct" de tipo modelos.Product.
+// Si ocurre un error durante la decodificación, establece el código de estado HTTP en 400 (Bad Request) y finaliza la ejecución.
+//
+// Obtiene una lista de productos utilizando la función ChargeProducts().
+// Recorre la lista de productos y actualiza el precio del producto con el ID proporcionado en "updatedProduct".
+// Si encuentra el producto y actualiza su precio, guarda la lista actualizada de productos utilizando la función SaveProducts().
+// Si ocurre un error al guardar los productos, establece el código de estado HTTP en 500 (Internal Server Error) y finaliza la ejecución.
+// Establece el código de estado HTTP en 200 (OK), codifica "updatedProduct" en JSON y lo escribe en la respuesta.
+// Finaliza la ejecución.
+//
+// Si no encuentra ningún producto con el ID proporcionado, establece el código de estado HTTP en 404 (Not Found) y finaliza la ejecución.
+func PatchPrice(response http.ResponseWriter, request *http.Request) {
+	response.Header().Set("Content-Type", "application/json")
+	if request.Method != http.MethodPatch {
+		response.WriteHeader(http.StatusMethodNotAllowed)
+		return
+	}
+
+	//Decode Parameters
+	decoder := json.NewDecoder(request.Body)
+	var updatedProduct modelos.Product
+	err := decoder.Decode(&updatedProduct)
+	if err != nil {
+		response.WriteHeader(http.StatusBadRequest)
+		return
+	}
+	// find product with provided id and update its Price
+	var productList []modelos.Product = ChargeProducts()
+	for index, product := range productList {
+		if product.Id == updatedProduct.Id {
+			productList[index].Price = updatedProduct.Price
+			err := SaveProducts(productList)
+			if err != nil {
+				response.WriteHeader(http.StatusInternalServerError)
+				return
+			}
+			response.WriteHeader(http.StatusOK)
+			json.NewEncoder(response).Encode(updatedProduct)
+			return
+		}
+	}
+	response.WriteHeader(http.StatusNotFound)
+
+}

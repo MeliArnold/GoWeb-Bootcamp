@@ -10,12 +10,12 @@
   },
   {
     "id": 2,
-    "name": "Pineapple - Canned, Rings",
+    "name": "Pineapple - Canned",
     "quantity": 345,
     "code_value": "M4637",
     "is_published": true,
     "expiration": "09/08/2021",
-    "price": 352.79
+    "price": 0
   },
   {
     "id": 3,
